@@ -3,6 +3,7 @@ package com.Kashif.blog_api.service;
 import com.Kashif.blog_api.entity.Comment;
 import com.Kashif.blog_api.entity.Post;
 import com.Kashif.blog_api.entity.User;
+import com.Kashif.blog_api.exception.ResourceNotFoundException;
 import com.Kashif.blog_api.repository.CommentRepository;
 import com.Kashif.blog_api.repository.PostRepository;
 import com.Kashif.blog_api.repository.UserRepository;
@@ -27,10 +28,10 @@ public class CommentServiceImpl implements CommentService{
     @Override
     public Comment createComment(Long postId ,Long userId, Comment comment){
         Post post = postRepository.findById(postId)
-                .orElseThrow(()-> new RuntimeException("Post not found with id:" + postId));
+                .orElseThrow(()-> new ResourceNotFoundException("Post not found with id:" + postId));
 
         User user = userRepository.findById(userId).
-                orElseThrow(()-> new RuntimeException("User not found with id:" + userId));
+                orElseThrow(()-> new ResourceNotFoundException("User not found with id:" + userId));
 
         comment.setPost(post);
         comment.setUser(user);
@@ -43,7 +44,7 @@ public class CommentServiceImpl implements CommentService{
     @Override
     public Comment getCommentById(Long id){
         return commentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Comment not found with id:" + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id:" + id));
     }
 
     @Override
@@ -59,7 +60,7 @@ public class CommentServiceImpl implements CommentService{
     @Override
     public void deleteComment(Long id){
         if (!commentRepository.existsById(id)) {
-            throw new RuntimeException("Comment not found with id: " + id);
+            throw new ResourceNotFoundException("Comment not found with id: " + id);
         }
         commentRepository.deleteById(id);
 
