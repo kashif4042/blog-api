@@ -1,1 +1,1 @@
-CRUD blog api with a security layer! (for practice)
+CRUD blog api with a security layer! (for practice).
