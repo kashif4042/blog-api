@@ -33,8 +33,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<Post> getAllPosts() {
-        return postRepository.findAll();
-
+        return postRepository.findAllByOrderByCreatedAtDesc();
     }
 
     @Override
@@ -42,6 +41,7 @@ public class PostServiceImpl implements PostService {
         return postRepository.findByAuthor(author);
 
     }
+
 
     @Override
     public Post updatePost(Long id, Post updatedPost) {
