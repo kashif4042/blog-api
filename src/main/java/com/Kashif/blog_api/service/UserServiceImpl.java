@@ -5,12 +5,16 @@ import com.Kashif.blog_api.exception.ResourceNotFoundException;
 import com.Kashif.blog_api.exception.UserAlreadyExistsException;
 import com.Kashif.blog_api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private UserRepository userRepository;
@@ -23,6 +27,11 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new UserAlreadyExistsException("Email already registered");
         }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        // Approach 2: old approach (2-3 steps)
+        // String plainPassword = user.getPassword();
+        // String hashedPassword = passwordEncoder.encode(plainPassword);
+        // user.setPassword(hashedPassword);
         return userRepository.save(user);
     }
 
