@@ -1,15 +1,22 @@
 package com.Kashif.blog_api.controller;
 
 
+import com.Kashif.blog_api.dto.LoginRequest;
+import com.Kashif.blog_api.dto.LoginResponse;
 import com.Kashif.blog_api.dto.UserRegisterRequest;
 import com.Kashif.blog_api.dto.UserResponse;
 import com.Kashif.blog_api.entity.Role;
 import com.Kashif.blog_api.entity.User;
+import com.Kashif.blog_api.security.CustomUserDetailsService;
+import com.Kashif.blog_api.security.JwtUtil;
 import com.Kashif.blog_api.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +25,16 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private CustomUserDetailsService userDetailsService;
+
 
     @Autowired
     private UserService userService;
@@ -80,5 +97,18 @@ public class UserController {
         UserResponse response = new UserResponse(user.getId(), user.getUsername(), user.getEmail());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+        );
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
+        String token = jwtUtil.generateToken(userDetails);
+
+        return new ResponseEntity<>(new LoginResponse(token), HttpStatus.OK);
+    }
+
+
 
 }
